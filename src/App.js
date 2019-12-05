@@ -16,7 +16,7 @@ function App() {
       <Router>
         <Switch>
           <Route exact path="/" component={Home} />
-          <Route path="/chat/:room" component={Chat}/>
+          <Route path="/chat/:room" component={Chatroom}/>
         </Switch>
       </Router>
     </div>
@@ -25,13 +25,13 @@ function App() {
 
 function Home() {
   const [ rooms, setRooms ] = useStore('rooms');
-  const [ roomName, setName ] = useState('roomName', '');
+  const [ roomName, setName ] = useState('');
   const allRooms = Object.keys(rooms);
 
   const handleSubmit = (e) => {
-    e.preventDefault();
     console.log("sent room "+ roomName)
     socket.emit('Add-room', {[roomName]: []})
+    setName('')
   }
 
   socket.on('Add-room', (room) => {
@@ -47,7 +47,7 @@ function Home() {
     <div>
       <form onSubmit={handleSubmit}>
         <label>Add chat room: 
-          <input type="text" onChange={ (e) => setName(e.target.value)} />
+          <input type="text" onChange={ (e) => setName(e.target.value)} value={roomName}/>
           <input type="submit" value="Add"/>
         </label>
       </form>
@@ -60,12 +60,13 @@ function Home() {
   )
 }
 
-function Chat() {
+function Chatroom() {
   const {room} = useParams();
 
   return (
     <div>
-      <h2>You are on chat {room}</h2>
+      <h2>You are in chat {room}</h2>
+        
     </div>
   )
 }
