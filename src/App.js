@@ -29,12 +29,13 @@ function Home() {
   const allRooms = Object.keys(rooms);
 
   const handleSubmit = (e) => {
+    // e.preventDefault();
     console.log("sent room "+ roomName)
     socket.emit('Add-room', {[roomName]: []})
     setName('')
   }
 
-  socket.on('Add-room', (room) => {
+  socket.on('Room-change', (room) => {
     // console.log('received room');
     // console.log(room);
     setRooms({
@@ -61,12 +62,46 @@ function Home() {
 }
 
 function Chatroom() {
+  const [ rooms, setRooms ] = useStore('rooms');
   const {room} = useParams();
+
+  socket.on('Msgs-change', (msg) => {
+    console.log('received msg');
+    console.log(msg);
+    setRooms(msg);
+  })
 
   return (
     <div>
       <h2>You are in chat {room}</h2>
-        
+      {rooms[room].map( (msg) => {
+        return (<div key={msg}>
+          {msg}
+        </div>)
+      })}
+      <AddMessage room={room}/>
+    </div>
+  )
+}
+
+function AddMessage({room}){
+  const [ msg, setMsg ] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("sent message " + msg + " in room " + room)
+    socket.emit('Add-msg', {room: room, message: msg})
+    setMsg('')
+  }
+
+  return (
+    <div>
+      <form onSubmit={handleSubmit}>
+        <label>
+          <input type="text" value={msg} onChange={ e => setMsg(e.target.value) }/>
+          <input type="submit" value="Send"/>
+        </label>
+      </form>
     </div>
   )
 }
