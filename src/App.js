@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect } from 'react';
 import {BrowserRouter as Router, Route, Switch, Link, useParams } from 'react-router-dom';
 import { createStore, useStore } from 'react-hookstore';
 import io from 'socket.io-client';
@@ -6,10 +6,9 @@ import io from 'socket.io-client';
 import './App.css';
 
 const socket = io('http://localhost:3001/');
+createStore('rooms', {});
 
 function App() {
-  createStore('rooms', {});
-
   return (
     <div className="App">
       <h1>Multi-room chat app</h1>
@@ -36,8 +35,6 @@ function Home() {
   }
 
   socket.on('Room-change', (room) => {
-    // console.log('received room');
-    // console.log(room);
     setRooms({
       ...rooms,
       ...room
@@ -65,19 +62,22 @@ function Chatroom() {
   const [ rooms, setRooms ] = useStore('rooms');
   const {room} = useParams();
 
-  socket.on('Msgs-change', (msg) => {
-    console.log('received msg');
-    console.log(msg);
-    setRooms(msg);
-  })
+  useEffect( () => {
+    socket.on('Msgs-change', (msg) => {
+      console.log('received msg');
+      console.log(msg);
+      setRooms(msg);
+    })
+  }, [setRooms])
 
   return (
     <div>
       <h2>You are in chat {room}</h2>
-      {rooms[room].map( (msg) => {
-        return (<div key={msg}>
-          {msg}
-        </div>)
+      {rooms[room] && rooms[room].map( (msg) => {
+        return (
+          <div key={msg}>
+            {msg}
+          </div>)
       })}
       <AddMessage room={room}/>
     </div>

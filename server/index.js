@@ -4,6 +4,7 @@ const io = require('socket.io')(http);
 const fs = require('fs');
 
 io.on('connection', function(socket){
+	console.log('connected with ' + socket.id)
 	{
 		fs.readFile('./Database/all.json', (err, raw) => {
 			if(err) throw err;
