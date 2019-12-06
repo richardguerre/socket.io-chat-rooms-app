@@ -65,8 +65,8 @@ function Chatroom() {
   useEffect( () => {
     socket.on('Msgs-change', (msg) => {
       console.log('received msg');
-      console.log(msg);
-      setRooms(msg);
+      console.log(msg); //only receives the current room
+      setRooms(msg); //overwrites all other rooms to empty
     })
   }, [setRooms])
 
